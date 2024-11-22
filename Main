@@ -1,0 +1,1018 @@
+#importing stufffz
+import tkinter as tk
+from tkinter import font as tkfont
+from tkinter import messagebox, ttk, Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import *
+import webbrowser
+from pathlib import Path
+import random
+
+class SampleApp(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.title_font = tkfont.Font(family='Arial', size=15, weight="bold", slant="italic")
+        self.title("RecordsofRuina")
+        self.saved_recipes = []  
+
+        self.resizable(False,False)
+
+        container = tk.Frame(self)
+        container.pack(side='top', fill='both', expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+        for F in (MainMenu, GeneratingAndFinding, CreditPage, AcousticGuitar, Violin, SavedSongs):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.frames[page_name] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame("MainMenu")
+
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def show_frame(self, page_name):
+        frame = self.frames[page_name]
+        frame.tkraise()
+        
+        if page_name == "SavedSongs":
+            frame.update_recipes()
+
+        page_geometries = {
+            "MainMenu": "612x770",
+            "GeneratingAndFinding": "757x704",
+            "CreditPage": "803x747",
+            "Violin": "894x1141",
+            "AcousticGuitar": "891x690"
+        }
+
+        if page_name in page_geometries:
+            self.geometry(page_geometries[page_name])
+        if page_name == "SavedSongs":
+            self.resizable(True,True)
+        else:
+            self.resizable(False,False)
+
+    def on_closing(self):
+        if messagebox.askyesno(title='Quit?', message='Are you sure you want to quit?'):
+            self.destroy()
+
+    def update_saved_recipes_page(self):
+        self.frames["SavedSongs"].update_recipes()
+
+class MainMenu(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Faiz Adri\proj\tugas akhir\mnframe\menu\frame0")
+
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
+
+        self.configure(bg="#FFFFFF")
+        self.canvas = Canvas(
+            self,
+            bg="#FFFFFF",
+            height=770,
+            width=612,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.place(x=0, y=0)
+
+        try:
+
+            def create_image(x, y, file):
+                img = PhotoImage(file=relative_to_assets(file))
+                self.canvas.create_image(x, y, image=img)
+                return img
+
+            def create_button(x, y, width, height, file, command):
+                btn_img = PhotoImage(file=relative_to_assets(file))
+                Button(
+                    self,
+                    image=btn_img,
+                    borderwidth=0,
+                    highlightthickness=0,
+                    command=command,
+                    relief="flat"
+                ).place(x=x, y=y, width=width, height=height)
+                return btn_img
+
+            images_info = [
+                (182.0, 202.0, "image_1.png"), (446.0, 205.0, "image_2.png"),
+                (306.0, 66.00003793499445, "image_3.png"), (306.29949951171875, 208.04036733844305, "image_4.png"),
+                (306.0, 581.0, "image_5.png"), (310.0, 329.0, "image_6.png"),
+                (164.0, 205.0, "image_7.png"),(164.0, 303.0, "image_8.png"),
+                (164.0, 403.0, "image_9.png"),(226.0, 205.0, "image_10.png"),
+                (209.0, 303.0, "image_11.png"),(209.0, 403.0, "image_12.png"),
+                (309.0, 247.0, "image_13.png"),(309.0, 345.0, "image_14.png"),
+                (309.0, 444.0, "image_15.png"),(309.0, 171.0, "image_16.png"),
+                (313.0,69.0, "image_17.png")
+            ]
+
+            self.images = [create_image(x, y, file) for x, y, file in images_info]
+
+            buttons_info = [
+                (205.0, 597.0, 211.82025146484375, 45.0, "FindNGen.png", lambda: self.controller.show_frame('GeneratingAndFinding')),
+                (205.0, 534.0, 211.73422241210938, 44.0, "SavedRecipes.png", lambda: self.controller.show_frame('SavedSongs')),
+                (19.0, 723.0, 212.0, 32.0, "Credits.png", lambda: self.controller.show_frame('CreditPage'))
+            ]
+
+            self.buttons = [create_button(x, y, width, height, file, command) for x, y, width, height, file, command in buttons_info]
+
+        except Exception as e:
+            print(f"Error loading images or creating widgets: {e}")
+
+        self.canvas.pack()
+
+class GeneratingAndFinding(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Faiz Adri\proj\tugas akhir\rspfram\assets\frame0")
+
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
+
+        self.configure(bg="#320101")
+        self.canvas = Canvas(
+            self,
+            bg="#320101",
+            height=704,
+            width=757,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.place(x=0, y=0)
+
+        try:
+            # Helper functions
+            def create_image(x, y, file):
+                img = PhotoImage(file=relative_to_assets(file))
+                self.canvas.create_image(x, y, image=img)
+                return img
+
+            def create_button(x, y, width, height, file, command):
+                btn_img = PhotoImage(file=relative_to_assets(file))
+                btn = Button(
+                    self,
+                    image=btn_img,
+                    borderwidth=0,
+                    highlightthickness=0,
+                    command=command,
+                    relief="flat"
+                )
+                btn.place(x=x, y=y, width=width, height=height)
+                return btn_img, btn
+
+            self.image_image_1 = create_image(380.0, 571.0, "image_1.png")
+
+            # Create buttons
+            buttons_info = [
+                (102.0, 437.0, 574.0, 45.688, "button_1.png", lambda: self.random_recipe()),
+                (229.411, 491.482, 318.241, 40.792, "button_2.png", lambda: self.find_recipe()),
+                (395.0, 606.0, 153.0, 22.798, "button_3.png", lambda: self.controller.show_frame('AcousticGuitar')),
+                (229.0, 606.0, 153.0, 22.798, "button_4.png", lambda: self.controller.show_frame('Violin')),
+                (45.316, 628.685, 133.475, 42.515, "button_5.png", lambda: self.controller.show_frame('MainMenu')),
+                (599.325, 628.685, 133.475, 42.515, "button_6.png", lambda: self.controller.show_frame('CreditPage')),
+            ]
+
+            self.buttons = [create_button(x, y, width, height, file, command) for x, y, width, height, file, command in buttons_info]
+
+            # Create the Entry widget with an image background
+            self.canvas.create_rectangle(
+                106.0,
+                49.0,
+                760.0,
+                254.0,
+                outline=""
+            )
+
+        except Exception as e:
+            print(f"Error loading images or creating widgets: {e}")
+
+        self.canvas.pack()
+
+        self.text = tk.Text(self, height=10, width=60)
+        self.text.pack()
+        self.text.place(x=150.017, y=150)
+
+        # Create ComboBoxes directly on top of the GenerateRecipe button
+        self.combobox1 = ttk.Combobox(self, values=["","Guitar", "Violin"])
+        self.combobox1.place(x=215.017, y=355.0, width=353.115, height=20)
+
+        self.combobox2 = ttk.Combobox(self, values=["", "Guitar", "Violin"])
+        self.combobox2.place(x=215.017, y=390.0, width=353.115, height=20)
+
+    def find_recipe(self):
+        value1 = self.combobox1.get()
+        value2 = self.combobox2.get()
+
+        if value1 == "Guitar" and value2 == "":
+            self.controller.show_frame('AcousticGuitar')
+        elif value1 == "Violin" and value2 == "":
+            self.controller.show_frame('Violin')
+        else:
+            messagebox.showwarning("Selection Error", "Please select a main ingredient and optionally a sub ingredient.")
+
+    def random_recipe(self):
+        print('test')
+        value1 = self.combobox1.get()
+        value2 = self.combobox2.get()
+        
+        if value1 == "Guitar" and value2 == "":
+            self.random_guitar_activity()
+        elif value1 == "Violin" and value2 == "":
+            self.random_violin_activity()
+        elif value1 == "Guitar" and value2 == "Violin" or value1 == "Guitar" and value2 == "Violin":
+            self.random_duet_activity()
+        else:
+            messagebox.showwarning("Selection Error", "Please select a main ingredient and optionally a sub ingredient.")
+
+
+    def random_guitar_activity(self):
+        utilities = ["amplifier", "pedalboard", "strap"]
+        guitar_models = ["electric guitar", "acoustic guitar", "bass guitar"]
+        techniques = ["fingerpicking", "strumming", "tapping"]
+        genres = ["rock", "jazz", "blues"]
+        minutes = random.randint(10, 30)
+
+        activity = (
+            f"Pick up your {random.choice(guitar_models)}, adjust the {random.choice(utilities)}, and get ready to play!\n"
+            f"Practice {random.choice(techniques)} for {minutes} minutes.\n"
+            f"End your session by improvising a melody in the {random.choice(genres)} genre."
+        )
+        self.display_recipe(activity)
+
+    def random_violin_activity(self):
+        utilities = ["music stand", "shoulder rest", "rosin"]
+        violin_pieces = ["concerto", "sonata", "etude"]
+        techniques = ["bowing", "vibrato", "pizzicato"]
+        composers = ["Bach", "Vivaldi", "Mozart"]
+        minutes = random.randint(15, 25)
+
+        activity = (
+            f"Set up your violin with a {random.choice(utilities)} and prepare your sheet music.\n"
+            f"Play a {random.choice(violin_pieces)} by {random.choice(composers)} and focus on perfecting your {random.choice(techniques)} technique.\n"
+            f"Take {minutes} minutes to practice and enjoy the harmony!"
+        )
+        self.display_recipe(activity)
+
+    def random_duet_activity(self):
+        utilities = ["recording equipment", "music sheets"]
+        instruments = ["guitar", "violin"]
+        techniques = ["harmonizing", "improvising", "playing in unison"]
+        genres = ["classical", "folk", "fusion"]
+        minutes = random.randint(20, 40)
+
+        activity = (
+            f"Grab your {random.choice(instruments)} and a partner with a {random.choice(instruments)}.\n"
+            f"Set up the {random.choice(utilities)} and spend {minutes} minutes practicing {random.choice(techniques)}.\n"
+            f"End your session with a duet in the {random.choice(genres)} genre and record it to share later!"
+        )
+        self.display_recipe(activity)
+
+
+    def display_recipe(self, recipe):
+        self.text.config(state=tk.NORMAL)
+        self.text.delete(1.0, tk.END)
+        self.text.insert(tk.END, recipe)
+        self.text.config(state=tk.DISABLED)
+
+class AcousticGuitar(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Faiz Adri\proj\tugas akhir\frame12\assets\frame0")
+
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
+
+        self.configure(bg="#FFFFFF")
+        self.canvas = Canvas(
+            self,
+            bg="#FFFFFF",
+            height=3000,
+            width=900,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.scrollbar = Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollbar.pack(side="right", fill="y")
+
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#FFFFFF")
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        self.inputGet()
+        self.images = {}
+
+        try:
+            def create_image(x, y, file):
+                img_path = relative_to_assets(file)
+                img = PhotoImage(file=img_path)
+                self.canvas.create_image(x, y, image=img)
+                return img
+
+            def create_button(x, y, width, height, file, command):
+                btn_img_path = relative_to_assets(file)
+                btn_img = PhotoImage(file=btn_img_path)
+                btn = Button(
+                    self,
+                    image=btn_img,
+                    borderwidth=0,
+                    highlightthickness=0,
+                    command=command,
+                    relief="flat"
+                )
+                btn.place(x=x, y=y, width=width, height=height)
+                return btn_img, btn   
+            
+            image_info = [
+                (445.0, 345.0, "image_1.png"),
+                (77.0, 318.0, "image_2.png")
+]
+
+            self.images = [create_image(x, y, file) for x, y, file in image_info]
+
+            buttons_info = [
+                # Main buttons
+                (0.0, 0.0, 282.2731628417969, 54.0, "button_1.png", lambda: controller.show_frame('MainMenu')),
+                (282.0, 0.0, 328.0, 54.0, "button_2.png", lambda: controller.show_frame('GeneratingAndFinding')),
+                (610.0, 0.0, 282.2731628417969, 54.0, "button_3.png", lambda: controller.show_frame('CreditPage')),
+                
+                # Recipe titles
+                (388.0, 154.0, 202.0, 366.0, "button_4.png", lambda: print("button_4 clicked")),
+                (612.0, 154.0, 202.0, 366.0, "button_5.png", lambda: print("button_5 clicked")),
+                (166.0, 154.0, 202.0, 366.0, "button_6.png", lambda: print("button_6 clicked")),
+                
+                # Description (bottom row to top row)
+                (612.0, 94.0, 202.0, 54.0, "button_7.png", lambda: self.Landslide()),
+                (388.0, 94.0, 202.0, 54.0, "button_8.png", lambda: self.Blacbird()),
+                (166.0, 94.0, 202.0, 54.0, "button_9.png", lambda: self.TheNeedleDamage()),
+                
+                # Footer button
+                (166.0, 546.5599365234375, 646.2144165039062, 34.000762939453125, "button_10.png", lambda: self.Extras()),
+            ]
+
+            self.buttons = [create_button(x, y, width, height, file, command) for x, y, width, height, file, command in buttons_info]
+
+        except Exception as e:
+            print(f"Error loading images or creating widgets: {e}")
+
+        self.canvas.pack()
+
+    def closewindow(self, window):
+        window.destroy()
+
+    def Landslide(self):
+        OpenWindow = Toplevel(self)
+        filipinoscorch = LabelFrame(OpenWindow, text='Landslide')
+        filipinoscorch.pack(padx=20, pady=10)  
+
+        buttonInfo = Button(OpenWindow, text='Show Chords', command=self.info1)
+        checkbutton = Checkbutton(filipinoscorch, variable=self.CheckButton1_var,
+                                  command=lambda: self.save_recipe(self.CheckButton1_var, 'Landslide', self.Landslide()) )
+
+        label = Label(filipinoscorch, text=self.Landslide())
+
+        checkbutton.pack()
+        buttonInfo.pack()
+        label.pack()
+
+        buttonexit = Button(OpenWindow, text='Exit', command=lambda: self.closewindow(OpenWindow))
+        buttonexit.pack()
+
+    def Blacbird(self):
+        OpenWindow = Toplevel(self)
+        sweetpotatoskin = LabelFrame(OpenWindow, text="BlackBird")
+        sweetpotatoskin.pack(padx=20, pady=10)  
+
+        button2Info = tk.Button(OpenWindow, text='Show Chords', command=self.info2)
+        CheckButton2 = tk.Checkbutton(OpenWindow, variable=self.CheckButton2_var,
+                                      command=lambda: self.save_recipe(self.CheckButton2_var, 'BlackBird', self.BlackBird()))
+        label2 = tk.Label(OpenWindow, text=self.BlackBird())
+
+        label2.pack()
+        button2Info.pack()
+        CheckButton2.pack()
+
+        buttonexit = Button(OpenWindow, text='Exit', command=lambda: self.closewindow(OpenWindow))
+        buttonexit.pack()
+
+    def TheNeedleDamage(self):
+        OpenWindow = Toplevel(self)
+        beefsliders = LabelFrame(OpenWindow, text="The Needle and The Damage")
+        beefsliders.pack(padx=20, pady=10)  # Center the label frame with fill
+
+        button3Info = tk.Button(OpenWindow, text='Show Chords', command=self.info3)
+        CheckButton3 = tk.Checkbutton(OpenWindow, variable=self.CheckButton3_var,
+                                      command=lambda: self.save_recipe(self.CheckButton3_var, 'The Needle and The Damage', self.NeedleAndDamage()))
+        label3 = tk.Label(OpenWindow, text=self.NeedleAndDamage())
+
+        label3.pack()
+        button3Info.pack()
+        CheckButton3.pack()
+
+        buttonexit = Button(OpenWindow, text='Exit', command=lambda: self.closewindow(OpenWindow))
+        buttonexit.pack()
+
+    def open_url(self, url):
+        webbrowser.open_new(url)
+
+    def Extras(self):
+        OpenWindow = Toplevel(self)
+
+        recipes = [
+            ("Avengers Theme Song", "https://musescore.com/user/142299/scores/5552319"),
+            ("Canon in D", "https://musescore.com/user/28842914/scores/5154865"),
+            ("In The Mood", "https://musescore.com/firefly_1026/scores/4834474")
+        ]
+
+        for recipe_name, url in recipes:
+            link = Label(OpenWindow, text=recipe_name, fg='blue', cursor='hand2', font=('Times New Roman', 20))
+            link.pack()
+            link.bind('<Button-1>', lambda e, url=url: self.open_url(url))
+
+    def inputGet(self):
+        self.CheckButton1_var = tk.IntVar()
+        self.CheckButton2_var = tk.IntVar()
+        self.CheckButton3_var = tk.IntVar()
+    
+    def Landslide(self):
+        return (
+            "Landslide",
+        "\n-----\n"
+        "1. **Tuning**\n"
+        "- Tune your guitar to standard tuning (EADGBE).\n"
+        "- No capo is needed, but you can place one on the 3rd fret to match Stevie Nicks' live version.\n\n"
+        "2. **Learn the Fingerpicking Pattern**\n"
+        "- Use your thumb for the bass notes on the E, A, and D strings.\n"
+        "- Use your index and middle fingers for the G, B, and high E strings.\n"
+        "- The picking pattern alternates between the bass and melody strings, creating a flowing rhythm.\n\n"
+        "3. **Chord Progression for the Verse**\n"
+        "- The main chords are: C - G/B - Am - G.\n"
+        "- Practice transitioning between these chords smoothly while maintaining the fingerpicking pattern.\n\n"
+        "4. **Master the Chorus**\n"
+        "- The chorus features: Em - A7 - D7 - G - C - G/B - Am - G.\n"
+        "- Focus on clear transitions and sustaining the melody with the picking pattern.\n\n"
+        "5. **Work on Timing and Dynamics**\n"
+        "- Listen to the original song to understand the tempo and emotional dynamics.\n"
+        "- Gradually build up speed while maintaining clarity in your picking.\n\n"
+        "6. **Add Personal Flair**\n"
+        "- Once you're comfortable, experiment with hammer-ons and pull-offs to add expression.\n"
+        "- Highlight the melody notes to make the song more engaging.\n\n"
+        "7. **Combine Singing with Playing**\n"
+        "- Practice singing along with the fingerpicking pattern once you feel confident.\n"
+        "- Match your vocal phrasing with the melody for a cohesive performance.\n\n"
+        "Tips:\n"
+        "- Break the song into sections and practice each one separately.\n"
+        "- Watch tutorials or live performances by Fleetwood Mac to refine your technique.\n"
+        "- Enjoy the journey of mastering this iconic and heartfelt song!"
+        )
+
+    def BlackBird(self):
+        return (
+            "BLACKBIRD\n------\n" 
+        "1. **Tuning**\n"
+        "- Make sure your guitar is in standard tuning (EADGBE).\n"
+        "- Adjust your capo to the 2nd fret to match the original recording.\n\n"
+        "2. **Learn the Fingerpicking Pattern**\n"
+        "- Use your thumb to pick the bass note on the E, A, or D string.\n"
+        "- Use your index or middle finger to pick the G, B, or high E strings.\n"
+        "- Practice alternating between the bass and treble notes smoothly.\n\n"
+        "3. **Practice the Intro**\n"
+        "- The intro alternates between the G and A7 shapes.\n"
+        "- Play the bass note with your thumb and the melody notes with your index/middle fingers.\n\n"
+        "4. **Learn the Verse Progression**\n"
+        "- Follow the chord progression: G - A7 - C - Am.\n"
+        "- Focus on the melody notes played with the B and high E strings.\n\n"
+        "5. **Work on the Timing and Dynamics**\n"
+        "- Listen closely to Paul McCartney's fingerstyle playing in the original song.\n"
+        "- Add subtle dynamics by varying the pressure and speed of your picking.\n\n"
+        "6. **Combine Singing with Playing**\n"
+        "- Once the picking pattern feels natural, start singing along.\n"
+        "- Align your fingerpicking with the vocal phrasing.\n\n"
+        "7. **Polish the Outro**\n"
+        "- The outro follows the same fingerpicking pattern as the verses.\n"
+        "- End on the G chord with a gentle fade for a smooth finish.\n\n"
+        )
+    
+    def NeedleAndDamage(self):
+        return (
+            'THE NEEDLE AND THE DAMAGE DONE\n'
+            '---\n'
+            'Step 1\n'
+            'Make sure your guitar is in standard tuning (EADGBE). Get comfortable with your guitar and set up a quiet space to focus. If youre using a pick, grab a light one for gentle strumming, or use your fingers for a more Neil Young-inspired style.\n'
+            '\nStep 2\n'
+            'The main chords used in the song are: D, C, G/B, F (you can use an easier Fmaj7 if needed).\n'
+            '\nStep 3\n'
+            'Neil Young often uses a mix of picking and strumming, giving the song a flowing, emotional feel.\n'
+            '\nStep 4\n'
+            'The intro is a combination of D and C chords with some hammer-ons and pull-offs on the high E string.\n'
+            '\nStep 5\n'
+            'The verses follow a sequence of D - C - G/B - F with some variations in picking and strumming.\n'
+            '\nStep 6\n'
+            'Once you’re comfortable with the chord progression and strumming/picking, start adding the lyrics.\n'
+            '\nStep 7\n'
+            'Experiment with light variations in strumming, picking, and dynamics to make the song your own while staying true to its essence.'
+        )
+
+    def info1(self):
+        messagebox.showinfo("Chords", "\n- D\n- F\n- C\n- G\n- Am7\n- Em\n- G/B (optional passing chord)")
+
+    def info2(self):
+        messagebox.showinfo("Chords", "\n- G\n- A7\n- Am7\n- C\n- D\n- Em\n- Bm\n\n(Note: Uses two-note chords and fingerpicking patterns.)")
+
+    def info3(self):
+        messagebox.showinfo("Chords", "\n- C\n- G/B\n- Am\n- G\n- Em\n- A7\n- D7\n\n(Note: Capo on 3rd fret for original key.)"
+    )
+
+    def save_recipe(self, var, title, recipe):
+        if var.get() == 1:
+            if (title, recipe) not in self.controller.saved_recipes:
+                self.controller.saved_recipes.append((title, recipe))
+        else:
+            if (title, recipe) in self.controller.saved_recipes:
+                self.controller.saved_recipes.remove((title, recipe))
+        self.controller.update_saved_recipes_page()
+    
+    def uncheck_all(self):
+        self.CheckButton1_var.set(0)
+        self.CheckButton2_var.set(0)
+        self.CheckButton3_var.set(0)
+
+
+class Violin(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Faiz Adri\proj\tugas akhir\itsgettingtome\assets\frame0")
+
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
+
+        self.configure(bg="#FFFFFF")
+        self.canvas = Canvas(
+            self,
+            bg="#FFFFFF",
+            height=3000,
+            width=891,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+
+        self.create_violinstuff()
+
+        self.images = {}
+
+        try:
+            def create_image(x, y, file):
+                img_path = relative_to_assets(file)
+                img = PhotoImage(file=img_path)
+                self.canvas.create_image(x, y, image=img)
+                return img
+
+            def create_button(x, y, width, height, file, command):
+                btn_img_path = relative_to_assets(file)
+                btn_img = PhotoImage(file=btn_img_path)
+                btn = Button(
+                    self,
+                    image=btn_img,
+                    borderwidth=0,
+                    highlightthickness=0,
+                    command=command,
+                    relief="flat"
+                )
+                btn.place(x=x, y=y, width=width, height=height)
+                return btn_img, btn   
+            
+            image_info = [
+                (445.0, 345.0, "image_1.png"),  # Gambar utama
+                (77.0, 318.0, "image_2.png"),  # Gambar tambahan
+            ]
+
+            self.images = [create_image(x, y, file) for x, y, file in image_info]
+
+            buttons_info = [
+                # Main buttons
+                (0.0, 0.0, 282.2731628417969, 54.0, "button_1.png", lambda: controller.show_frame('MainMenu')),
+                (282.0, 0.0, 328.0, 54.0, "button_2.png", lambda: controller.show_frame('GeneratingAndFinding')),
+                (610.0, 0.0, 282.2731628417969, 54.0, "button_3.png", lambda: controller.show_frame('CreditPage')),
+
+                # Recipe titles
+                (388.0, 154.0, 202.0, 366.0, "button_4.png", lambda: print("button_4 clicked")),
+                (612.0, 154.0, 202.0, 366.0, "button_5.png", lambda: print("button_5 clicked")),
+                (166.0, 154.0, 202.0, 366.0, "button_6.png", lambda: print("button_6 clicked")),
+
+                # Description buttons (row alignment)
+                (612.0, 94.0, 202.0, 54.0, "button_7.png", lambda: self.PartitaNoTwo()),
+                (388.0, 94.0, 202.0, 54.0, "button_8.png", lambda: self.SP2CWINDOW()),
+                (166.0, 94.0, 202.0, 54.0, "button_9.png", lambda: self.ViolinConcerto()),
+
+                # Footer button
+                (166.0, 546.5599365234375, 646.2144165039062, 34.000762939453125, "button_10.png", lambda: self.Extras()),
+            ]
+
+            self.buttons = [create_button(x, y, width, height, file, command) for x, y, width, height, file, command in buttons_info]
+
+
+        except Exception as e:
+            print(f"Error loading images or creating widgets: {e}")
+
+        self.canvas.pack()
+
+    def save_recipe(self, var, title, recipe_func):
+        if var.get() == 1:
+            self.controller.frames['SavedSongs'].add_recipe(title, recipe_func())
+
+    def PartitaNoTwo(self):
+        NewWindowOpen = Toplevel(self)
+        VFT = LabelFrame(NewWindowOpen, text='PartitaNoTwo')
+        VFT.pack(padx=20, pady=10, anchor='center')  # Center the label frame with fill
+
+        buttonInfo = Button(NewWindowOpen, text='Show Chords', command=self.info1)
+        buttonexit = Button(NewWindowOpen, text='Exit', command=lambda: self.closewindow(NewWindowOpen))
+        CheckButton = tk.Checkbutton(NewWindowOpen, variable=self.CheckButton1_var,
+                                      command=lambda: self.save_recipe(self.CheckButton1_var, 'PartitaNoTwo', self.PartitaNoTwo()))
+
+
+        label = Label(NewWindowOpen, text=self.PartitaNoTwo())
+
+        CheckButton.pack()
+        buttonInfo.pack()
+        label.pack()
+        buttonexit.pack()
+
+    def SP2CWINDOW(self):
+        SP2CWINDOW = Toplevel(self)
+        SP2C = LabelFrame(SP2CWINDOW, text="TheFourSeasons")
+        SP2C.pack(padx=20, pady=10, anchor='center')  # Center the label frame with fill
+
+        button2Info = Button(SP2CWINDOW, text='Show Chords', command=self.info2)
+        label2 = Label(SP2CWINDOW, text=self.TheFourSeasons())
+        CheckButton = tk.Checkbutton(SP2CWINDOW, variable=self.CheckButton2_var,
+                                      command=lambda: self.save_recipe(self.CheckButton2_var, 'TheFourSeasons', self.TheFourSeasons()))
+
+        buttonexit = Button(SP2CWINDOW, text='Exit', command=lambda: self.closewindow(SP2CWINDOW))
+
+        CheckButton.pack()
+        button2Info.pack()
+        label2.pack()
+        buttonexit.pack()
+
+    def ViolinConcerto(self):
+        VPWINDOW = Toplevel(self)
+        SP2C = LabelFrame(VPWINDOW, text="ViolinConcerto")
+        SP2C.pack(padx=20, pady=10, anchor='center')  # Center the label frame with fill
+
+        button2Info = Button(VPWINDOW, text='Show Chords', command=self.info2)
+        label2 = Label(VPWINDOW, text=self.ViolonConcertoNoOne())
+        CheckButton = tk.Checkbutton(VPWINDOW, variable=self.CheckButton3_var,
+                                      command=lambda: self.save_recipe(self.CheckButton3_var, 'ViolinConcerto', self.ViolonConcertoNoOne()))
+
+        buttonexit = Button(VPWINDOW, text='Exit', command=lambda: self.closewindow(VPWINDOW))
+
+        CheckButton.pack()
+        button2Info.pack()
+        label2.pack()
+        buttonexit.pack()
+
+        self.canvas.pack()
+
+    def open_url(self, url):
+        webbrowser.open_new(url)
+
+    def Extras(self):
+        OpenWindow = Toplevel(self)
+
+        recipes = [
+            ("Pirates of The Carrabiean", "https://musescore.com/user/5282081/scores/5949862"),
+            ("Merry Go Round Life", "https://musescore.com/user/10460121/scores/3569956"),
+            ("Canon in D", "https://musescore.com/user/88585/scores/105013")
+        ]
+
+        for recipe_name, url in recipes:
+            link = Label(OpenWindow, text=recipe_name, fg='blue', cursor='hand2', font=('Times New Roman', 20))
+            link.pack()
+            link.bind('<Button-1>', lambda e, url=url: self.open_url(url))
+
+    def create_violinstuff(self):
+        self.CheckButton1_var = tk.IntVar()
+        self.CheckButton2_var = tk.IntVar()
+        self.CheckButton3_var = tk.IntVar()
+
+    def PartitaNoTwo(self):
+        return (
+            'Bach - Partita No.2, Chaconne'
+            '\n----\n'
+            "Steps for Bach - Partita No. 2 in D Minor, Chaconne (Violin)",
+        "Steps:\n"
+        "Step 1\n"
+        "Ensure your violin is tuned in standard tuning (GDAE). The Chaconne was composed for solo violin in standard tuning, so its essential your violin is tuned properly.\n"
+        "\nStep 2\n"
+        "Study the sheet music carefully. The Chaconne is a technically demanding piece, and it is important to break it down into smaller sections. Start with the first few bars and gradually work your way through.\n"
+        "\nStep 3\n"
+        "Focus on the bow technique. The Chaconne features long, sustained bow strokes, and you will need to control the sound quality throughout. Work on smooth, controlled bowing, especially on the down-bows and up-bows.\n"
+        "\nStep 4\n"
+        "Practice the left hands fingerings. The piece requires shifts between various positions on the fingerboard, so practice smooth shifting and maintaining proper intonation as you move up and down the violin.\n"
+        "\nStep 5\n"
+        "Work on the double stops. The Chaconne features complex double-stop passages that demand precision in both bowing and finger placement. Begin slowly and gradually increase speed while maintaining evenness in tone.\n"
+        "\nStep 6\n"
+        "Pay close attention to the phrasing. Bachs music is deeply expressive, and even though the Chaconne is mostly in a continuous, repetitive rhythmic pattern, you should aim for musicality and phrasing to bring out its emotional depth.\n"
+        "\nStep 7\n"
+        "Build up stamina. The Chaconne is a long piece, so it is important to build endurance in both your bow arm and left hand. Practice in sections, taking breaks as needed to avoid fatigue.\n"
+        "\nStep 8\n"
+        "Gradually increase the tempo. Start by practicing the piece slowly and with great attention to detail, then gradually build up speed as you become more confident with the notes and technique.\n"
+        "\nStep 9\n"
+        "Once you have mastered the technical aspects, focus on the dynamics and expression. The Chaconne is emotionally powerful, and the phrasing, dynamics, and articulation are key to conveying its depth.\n"
+        )
+
+    def TheFourSeasons(self):
+        return (
+            'Vivaldi - The Four Seasons\n----\n'
+             "Step 1\n"
+        "Ensure your violin is in standard tuning (GDAE). Vivaldi’s *The Four Seasons* was written for the violin in standard tuning, so check your strings carefully.\n"
+        "\nStep 2\n"
+        "Choose the movement you want to practice (e.g., *Spring*, *Summer*, *Autumn*, *Winter*). Each movement has its own mood and unique technical challenges.\n"
+        "\nStep 3\n"
+        "Study the sheet music and focus on the phrasing. Vivaldi’s work is highly ornamented, so take note of trills, mordents, and other ornamentations.\n"
+        "\nStep 4\n"
+        "Work on the bow technique for each movement. For example, *Spring* requires smooth, flowing bow strokes, while *Winter* often requires crisp, controlled bowing with sharper attacks.\n"
+        "\nStep 5\n"
+        "Focus on vibrato. For example, in *Spring*, the vibrato should be light and flowing, while in *Winter*, you may need more precise, controlled vibrato to match the sharpness of the piece.\n"
+        "\nStep 6\n"
+        "Practice the left-hand fingerings, especially when shifting between higher positions. *The Four Seasons* features both quick passages and large interval jumps, so pay attention to your shifting and intonation.\n"
+        "\nStep 7\n"
+        "Work on your articulation. Vivaldi's music is often fast-paced, with rapid bowing and quick string crossings. Practice slow, deliberate bow strokes to perfect your articulation.\n"
+        "\nStep 8\n"
+        "Once you're comfortable with each section, work on playing the full movement. Keep your rhythm steady with a metronome, and gradually increase your tempo as you become more comfortable.\n"
+        "\nStep 9\n"
+        "Perform the piece with expression, paying attention to the mood and dynamic changes. *Spring* should feel bright and joyful, while *Winter* may feel more intense and dramatic.\n"
+        )
+    
+    def ViolonConcertoNoOne(self):
+        return (
+            'Bruch - Violin Concerto No. 1\n-----\n'
+             "Step 1\n"
+        "Tune your violin to standard tuning (GDAE). Ensure your instrument is in tune before starting, as this will affect the sound quality throughout the concerto.\n"
+        "\nStep 2\n"
+        "Study the sheet music and familiarize yourself with the concerto's three movements: the first movement (I. Allegro), the second movement (II. Adagio), and the third movement (III. Finale: Allegro energico).\n"
+        "\nStep 3\n"
+        "Begin by mastering the first movement. The first movement of the concerto is fast and technically challenging. Focus on clean double stops, smooth shifting, and fast finger work.\n"
+        "\nStep 4\n"
+        "Work on your bowing technique. The first movement requires rapid bow changes and precise control, especially in the faster passages. Practice keeping the bow straight and maintaining a clean, focused tone.\n"
+        "\nStep 5\n"
+        "For the second movement (Adagio), focus on the lyrical qualities of the music. This movement is slower and more expressive, requiring smooth bow strokes and emotional depth. Pay attention to the long, sustained notes and subtle dynamic changes.\n"
+        "\nStep 6\n"
+        "In the third movement (Finale: Allegro energico), the tempo increases and the difficulty also rises. It features lively and energetic passages, so make sure you practice your articulation, spiccato, and staccato bowing for clarity in the fast sections.\n"
+        "\nStep 7\n"
+        "Practice shifting and position changes. The concerto requires shifts across the fingerboard, and smooth, accurate shifts are essential. Focus on maintaining intonation during these transitions.\n"
+        "\nStep 8\n"
+        "Work on phrasing and musicality. Bruchs concerto is known for its expressive melodies and beautiful phrasing. Work on bringing out the lyrical qualities in all three movements, especially in the more emotional moments of the second movement.\n"
+        "\nStep 9\n"
+        "Practice with the orchestra or accompaniment (if possible). The concerto was written for violin and orchestra, so it’s important to practice with the orchestral parts or a piano reduction to get a sense of the overall sound and balance.\n"
+        "\nStep 10\n"
+        "Build up stamina and endurance. The concerto is long and requires a lot of energy. Practice in sections, taking breaks if necessary, and gradually increase the tempo and intensity as you become more comfortable with the piece.\n"
+        )
+
+    def info1(self):
+        messagebox.showinfo("Chords", "\n- D\n- F\n- C\n- G\n- Am7\n- Em\n- G/B (optional passing chord)")
+
+    def info2(self):
+        messagebox.showinfo("Chords", "\n- D\n- F\n- C\n- G\n- Am7\n- Em\n- G/B (optional passing chord)")
+
+    def info3(self):
+        messagebox.showinfo("Chords", "\n- D\n- F\n- C\n- G\n- Am7\n- Em\n- G/B (optional passing chord)")
+
+    def closewindow(self, window):
+        window.destroy()
+
+    def save_recipe(self, var, title, recipe):
+        if var.get() == 1:
+            if (title, recipe) not in self.controller.saved_recipes:
+                self.controller.saved_recipes.append((title, recipe))
+        else:
+            if (title, recipe) in self.controller.saved_recipes:
+                self.controller.saved_recipes.remove((title, recipe))
+        self.controller.update_saved_recipes_page()
+    
+    def uncheck_all(self, window):
+        self.CheckButton1_var.set(0)
+        self.CheckButton2_var.set(0)
+
+class SavedSongs(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        # Top menu button
+        self.buttonMenu = tk.Button(
+            self,
+            text="Return to Main Menu",
+            command=lambda: controller.show_frame('MainMenu')
+        )
+        self.buttonMenu.pack(padx=5, pady=5)
+
+        # Frame for static "No saved recipes" text
+        self.center_text_frame = tk.Frame(self)
+        self.center_text_frame.pack(side="top", fill="both", expand=True)
+
+        self.center_text_label = tk.Label(
+            self.center_text_frame,
+            text="",
+            font=("Arial", 14),
+            justify="center"
+        )
+        self.center_text_label.pack(expand=True)
+
+        # Scrollable frame for recipes
+        self.canvas = tk.Canvas(self)
+        self.scrollable_frame = tk.Frame(self.canvas)
+
+        # Add scrollbar
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        # Pack canvas and scrollbar
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        # Create a window inside the canvas
+        self.canvas_frame = self.canvas.create_window(
+            (0, 0), window=self.scrollable_frame, anchor="n"
+        )
+
+        # Bind resizing events
+        self.scrollable_frame.bind("<Configure>", self._on_frame_configure)
+        self.canvas.bind("<Configure>", self._on_canvas_configure)
+
+        # Bottom frame for "Clear Recipes" button
+        self.bottom_frame = tk.Frame(self)
+        self.bottom_frame.pack(side="bottom", fill="x", pady=10)
+        self.clearButton = tk.Button(self.bottom_frame, text='Clear All', command=self.AYS)
+        self.clearButton.pack(pady=5)
+
+    def _on_frame_configure(self, event):
+        """Adjust canvas scroll region to fit the frame."""
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def _on_canvas_configure(self, event):
+        """Resize the scrollable frame width to match the canvas."""
+        canvas_width = event.width
+        self.canvas.itemconfig(self.canvas_frame, width=canvas_width)
+
+    def update_recipes(self):
+        # Clear the scrollable frame content
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+
+        # Update static text
+        if not self.controller.saved_recipes:
+            self.center_text_label.config(text="No saved recipes.")
+            self.center_text_frame.pack(side="top", fill="both", expand=True)
+        else:
+            self.center_text_label.config(text="")  # Clear the static text
+            self.center_text_frame.pack_forget()  # Hide the static text frame
+
+            # Populate with recipes
+            for title, recipe in self.controller.saved_recipes:
+                # Limit the frame width and center it
+                frame = tk.LabelFrame(
+                    self.scrollable_frame,
+                    text=title,
+                    font=("Arial", 12),
+                    labelanchor="n",
+                    width=400  # Set a fixed width for each frame
+                )
+                frame.pack(padx=20, pady=10)
+
+                # Center the recipe text
+                label = tk.Label(
+                    frame,
+                    text=recipe,
+                    wraplength=380,  # Set wrap length slightly smaller than frame width
+                    justify="center",
+                    anchor="center"
+                )
+                label.pack(padx=10, pady=5)
+
+    def AYS(self):
+        # Confirm before clearing recipes
+        if self.controller.saved_recipes:
+            if messagebox.askyesno(
+                title="Clear All",
+                message="Are you sure you would like to clear your saved recipes?"
+            ):
+                self.clear_recipes()
+        else:
+            messagebox.showinfo("", "There are no saved recipes to clear.")
+
+    def clear_recipes(self):
+        # Clear the saved recipes list
+        self.controller.saved_recipes.clear()
+
+        # Optionally, call a method to uncheck all items in MeatPage
+        if 'MeatPage' in self.controller.frames:
+            if hasattr(self.controller.frames['MeatPage'], 'uncheck_all'):
+                self.controller.frames['MeatPage'].uncheck_all()
+
+        # Refresh the UI
+        self.update_recipes()
+
+class CreditPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\Faiz Adri\proj\tugas akhir\creditsframe\assets\frame0")
+
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
+
+        def create_image(x, y, file):
+            img = PhotoImage(file=relative_to_assets(file))
+            self.canvas.create_image(x, y, image=img)
+            return img
+
+        def create_button(x, y, width, height, file, command):
+            btn_img = PhotoImage(file=relative_to_assets(file))
+            Button(
+                self,
+                image=btn_img,
+                borderwidth=0,
+                highlightthickness=0,
+                command=command,
+                relief="flat"
+            ).place(x=x, y=y, width=width, height=height)
+            return btn_img
+
+        self.configure(bg="#FFFFFF")
+        self.canvas = Canvas(
+            self,
+            bg="#FFFFFF",
+            height=747,
+            width=803,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.pack()
+
+        try:
+            # Create images
+            self.image_image_1 = create_image(401.0, 373.0, "image_1.png")
+            self.image_image_2 = create_image(401.0, 373.0, "image_2.png")
+            self.image_image_3 = create_image(577.0, 404.0, "image_3.png")
+
+            # Create button
+            self.button_image_1 = create_button(330.467, 666.998, 141.682, 45.284, "button_1.png", command=lambda: self.controller.show_frame('MainMenu'))
+
+            # Create text
+            text_specs = [
+                (190.0, 330.0, "Muhammad Faiz Adri Ar Rasyid", "InriaSerif Bold", 32),
+                (220.0, 109.0, "Jurusan Teknik Komputer", "Inter Bold", 32),
+                (276.0, 161.0, "Angkatan 2023", "Inter Bold", 32),
+                (289.0, 380.0, "21120123140183", "InriaSerif Bold", 32)
+            ]
+            for x, y, text, font, size in text_specs:
+                self.canvas.create_text(x, y, anchor="nw", text=text, fill="#000000", font=(font, size * -1))
+
+            # Create rectangles
+            rectangle_specs = [
+                (157.0, 373.0, 645.0, 374.0),
+                (156.0, 152.0, 645.0, 154.0)
+            ]
+            for x1, y1, x2, y2 in rectangle_specs:
+                self.canvas.create_rectangle(x1, y1, x2, y2, fill="#000000", outline="")
+        except Exception as e:
+            print(f"Error loading images or creating widgets: {e}")
+
+if __name__ == "__main__":
+    app = SampleApp()
+    app.mainloop()
